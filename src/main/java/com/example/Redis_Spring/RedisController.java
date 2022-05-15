@@ -16,6 +16,8 @@ public class RedisController {
 
     private static final String KEY_PREFIX = "person::";
 
+    //---------------------------------------Value Operations ---------------------------------------------
+
     @PostMapping("/setValue")
     public void setValue(@Valid @RequestBody Person person){
         String key = KEY_PREFIX+person.getId();
@@ -37,4 +39,6 @@ public class RedisController {
                 .collect(Collectors.toList());
     }
 
+    //----------------------------------------List Operations -----------------------------------------------
+    
 }
