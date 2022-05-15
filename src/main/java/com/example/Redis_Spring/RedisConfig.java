@@ -6,6 +6,7 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
@@ -16,11 +17,21 @@ public class RedisConfig {
         redisStandaloneConfiguration.setPassword("F1lu42k3nieD99ViIywMn51nynYLt95i");
 
         JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
+
+        jedisConnectionFactory.afterPropertiesSet();
+
+        return jedisConnectionFactory;
     }
 
     @Bean
     public RedisTemplate<String, Object> getTemplate(){
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setValueSerializer(JdkSerializationRedisSerializer());
+        redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
+        redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+
+        redisTemplate.setConnectionFactory(getRedisFactory());
+
+        return redisTemplate;
     }
 }
