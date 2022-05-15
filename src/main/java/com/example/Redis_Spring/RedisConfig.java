@@ -1,5 +1,6 @@
 package com.example.Redis_Spring;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -34,4 +35,5 @@ public class RedisConfig {
 
         return redisTemplate;
     }
+
 }

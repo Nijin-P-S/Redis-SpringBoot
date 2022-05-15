@@ -1,21 +1,28 @@
 package com.example.Redis_Spring;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
 public class RedisController {
 
     @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
     RedisTemplate<String, Object> redisTemplate;
+
 
     private static final String KEY_PREFIX = "person::";
     private static final String PERSON_LIST_KEY = "person_list::";
+    private static final String HASH_KEY_PREFIX = "person_hk::";
 
     //---------------------------------------Value Operations ---------------------------------------------
 
@@ -68,5 +75,24 @@ public class RedisController {
         return redisTemplate.opsForList().range(PERSON_LIST_KEY, start, end).stream()
                 .map(obj -> (Person)obj)
                 .collect(Collectors.toList());
+    }
+
+    //--------------------------------------------Hash Operations-------------------------------------
+
+    @PostMapping("/hmset")
+    public void hmset(@Valid @RequestBody Person person){
+
+        String key = HASH_KEY_PREFIX + person.getId();
+
+        //Person --> Map<String, Object>  ------This can be done using Object Mapper
+
+        Map map = objectMapper.convertValue(person, Map.class);
+        redisTemplate.opsForHash().putAll(key, map);
+    }
+
+    @GetMapping("/hgetAll")
+    public Map hgetAll(@RequestParam("id") int id){
+        String key = HASH_KEY_PREFIX + id;
+        return redisTemplate.opsForHash().entries(key);
     }
 }
