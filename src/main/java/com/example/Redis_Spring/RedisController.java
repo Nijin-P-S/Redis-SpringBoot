@@ -15,6 +15,7 @@ public class RedisController {
     RedisTemplate<String, Object> redisTemplate;
 
     private static final String KEY_PREFIX = "person::";
+    private static final String PERSON_LIST_KEY = "person_list::";
 
     //---------------------------------------Value Operations ---------------------------------------------
 
@@ -40,5 +41,32 @@ public class RedisController {
     }
 
     //----------------------------------------List Operations -----------------------------------------------
-    
+
+    @PostMapping("/lpush")
+    public void lpsuh(@Valid @RequestBody Person person){
+        redisTemplate.opsForList().leftPush(PERSON_LIST_KEY, person);
+    }
+
+    @PostMapping("/rpush")
+    public void rpsuh(@Valid @RequestBody Person person){
+        redisTemplate.opsForList().rightPush(PERSON_LIST_KEY, person);
+    }
+
+    @DeleteMapping("/lpop")
+    public void lpop(@RequestParam(value = "count", required = false, defaultValue = "1") int count){
+        redisTemplate.opsForList().leftPop(PERSON_LIST_KEY, count);
+    }
+
+    @PostMapping("/rpop")
+    public void rpop(@RequestParam(value = "count", required = false, defaultValue = "1") int count){
+        redisTemplate.opsForList().rightPop(PERSON_LIST_KEY, count);
+    }
+
+    @GetMapping("/lrange")
+    public List<Person> lrange(@RequestParam(value = "start", required = false,defaultValue = "0") int start,
+                               @RequestParam(value = "end" ,required = false, defaultValue = "-1") int end){
+        return redisTemplate.opsForList().range(PERSON_LIST_KEY, start, end).stream()
+                .map(obj -> (Person)obj)
+                .collect(Collectors.toList());
+    }
 }
